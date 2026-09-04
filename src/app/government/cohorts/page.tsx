@@ -35,18 +35,20 @@ export default function CohortsPage() {
           </div>
           <button 
             onClick={async () => {
+              const phone = prompt("Enter your mobile number (with country code, e.g. +918088036723) to receive the demo SMS:");
+              if (!phone) return;
+
               try {
-                alert("Triggering SMS via Twilio...");
                 // In demo, we just pass a dummy ID that our backend will recognize, 
-                // or we use a hardcoded Twilio trigger just for the hackathon demo
+                // and pass the provided phone number.
                 const res = await fetch("/api/followup/trigger", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ trainee_id: "demo-id", checkpoint_days: 90 })
+                  body: JSON.stringify({ trainee_id: "demo-id", checkpoint_days: 90, target_phone: phone })
                 });
                 const data = await res.json();
                 if (data.success) {
-                  alert("SMS Sent Successfully! Message ID: " + data.messageId);
+                  alert("SMS Sent Successfully! Check your phone.");
                 } else {
                   alert("Error sending SMS: " + data.error);
                 }

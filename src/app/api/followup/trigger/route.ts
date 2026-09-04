@@ -5,7 +5,7 @@ import crypto from 'crypto'
 
 export async function POST(req: Request) {
   try {
-    const { trainee_id, checkpoint_days = 90 } = await req.json()
+    const { trainee_id, checkpoint_days = 90, target_phone } = await req.json()
     const supabase = createServiceClient()
 
     // 1. Fetch Trainee Details
@@ -44,16 +44,20 @@ export async function POST(req: Request) {
     const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
     const firstName = trainee.name_encrypted.split(' ')[0]
 
+    // Use the explicitly provided phone number for the hackathon demo, 
+    // otherwise fallback to the DB (which will likely fail Twilio validation if it's a fake number)
+    const phoneToSendTo = target_phone || trainee.phone_encrypted;
+
     const message = await twilioClient.messages.create({
       body: `Hi ${firstName}! It's been ${checkpoint_days} days since your course. Please update your employment status to help improve Maharashtra's skilling programs: ${surveyLink}`,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: trainee.phone_encrypted // In a real app, this would be decrypted first
+      to: phoneToSendTo
     })
 
     return NextResponse.json({ success: true, messageId: message.sid, link: surveyLink })
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('Trigger error:', err)
-    return NextResponse.json({ error: 'Failed to trigger follow-up' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to trigger follow-up' }, { status: 500 })
   }
 }
