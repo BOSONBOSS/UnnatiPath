@@ -35,30 +35,30 @@ export default function CohortsPage() {
           </div>
           <button 
             onClick={async () => {
-              const phone = prompt("Enter your mobile number (with country code, e.g. +918088036723) to receive the demo SMS:");
-              if (!phone) return;
-
               try {
-                // In demo, we just pass a dummy ID that our backend will recognize, 
-                // and pass the provided phone number.
+                // We call the backend to generate the secure token and record the touchpoint in Supabase
                 const res = await fetch("/api/followup/trigger", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ trainee_id: "demo-id", checkpoint_days: 90, target_phone: phone })
+                  body: JSON.stringify({ trainee_id: "demo-id", checkpoint_days: 90, target_phone: "simulated" })
                 });
                 const data = await res.json();
-                if (data.success) {
-                  alert("SMS Sent Successfully! Check your phone.");
+                
+                if (data.link) {
+                  // Simulate the user receiving the SMS and clicking the link
+                  alert("Simulated SMS: Opening the secure mobile survey link...");
+                  window.open(data.link, "_blank");
                 } else {
-                  alert("Error sending SMS: " + data.error);
+                  alert("Error generating survey link: " + data.error);
                 }
               } catch (e) {
-                alert("Network error calling SMS API");
+                alert("Network error generating survey.");
               }
             }}
-            className="text-xs bg-slate-900 text-white px-3 py-2 rounded-md font-semibold shadow-sm hover:bg-slate-800 transition"
+            className="text-xs bg-slate-900 text-white px-3 py-2 rounded-md font-semibold shadow-sm hover:bg-slate-800 transition flex items-center gap-2"
           >
-            Trigger 90-Day Check-in SMS (Twilio Demo)
+            <span>Simulate 90-Day SMS Link</span>
+            <span className="bg-white/20 px-1.5 py-0.5 rounded text-[10px]">Demo Safe</span>
           </button>
         </div>
       </div>
