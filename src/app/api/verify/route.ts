@@ -3,22 +3,14 @@ import { createServiceClient } from '@/lib/supabase'
 
 export async function POST(req: Request) {
   try {
-    const { token, pf_number, employer_name } = await req.json()
+    const { token, pf_number, employer_name, outcome_id } = await req.json()
     const supabase = createServiceClient()
 
-    // 1. In a real app, 'token' would securely identify the employer/outcome.
-    // For the hackathon, we simulate finding the outcome based on the token context.
-    // Assuming token maps to a specific employment_outcome id or we just verify the latest one for demo
-    
-    // Demo simplification: We verify an outcome directly based on trainee_id if passed, 
-    // or just assume we have the outcome ID directly for the demo
-    const { outcome_id } = await req.json() // Expecting the frontend to pass outcome_id for demo
-
     if (!outcome_id) {
-        return NextResponse.json({ error: 'Missing outcome ID' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing outcome ID' }, { status: 400 })
     }
 
-    // 2. Determine verification strength
+    // Determine verification strength
     // If PF number is provided, we simulate an EPFO verification (strongest)
     // If no PF number, it's just Employer OTP verification
     const verifiedBy = pf_number ? 'epfo' : 'employer'
@@ -27,7 +19,7 @@ export async function POST(req: Request) {
       .from('employment_outcomes')
       .update({
         verified_by: verifiedBy,
-        employer_id: null // In full app, we would link or create the employer record here
+        employer_id: null
       })
       .eq('id', outcome_id)
 
