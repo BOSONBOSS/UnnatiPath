@@ -1,5 +1,5 @@
 {
-  "name": "skilltrace-sih2026",
+  "name": "unnatipath",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "twilio": "^6.1.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
