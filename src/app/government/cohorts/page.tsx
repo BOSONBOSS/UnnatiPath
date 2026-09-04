@@ -29,8 +29,35 @@ export default function CohortsPage() {
           </p>
         </div>
 
-        <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-3 py-2 rounded-md">
-          Cohort 2026-A &bull; Longitudinal Tracking Active
+        <div className="flex flex-col gap-2 items-end">
+          <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-3 py-2 rounded-md">
+            Cohort 2026-A &bull; Longitudinal Tracking Active
+          </div>
+          <button 
+            onClick={async () => {
+              try {
+                alert("Triggering SMS via Twilio...");
+                // In demo, we just pass a dummy ID that our backend will recognize, 
+                // or we use a hardcoded Twilio trigger just for the hackathon demo
+                const res = await fetch("/api/followup/trigger", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ trainee_id: "demo-id", checkpoint_days: 90 })
+                });
+                const data = await res.json();
+                if (data.success) {
+                  alert("SMS Sent Successfully! Message ID: " + data.messageId);
+                } else {
+                  alert("Error sending SMS: " + data.error);
+                }
+              } catch (e) {
+                alert("Network error calling SMS API");
+              }
+            }}
+            className="text-xs bg-slate-900 text-white px-3 py-2 rounded-md font-semibold shadow-sm hover:bg-slate-800 transition"
+          >
+            Trigger 90-Day Check-in SMS (Twilio Demo)
+          </button>
         </div>
       </div>
 

@@ -9,13 +9,21 @@ export async function POST(req: Request) {
     const supabase = createServiceClient()
 
     // 1. Fetch Trainee Details
-    const { data: trainee } = await supabase
+    let traineeQuery = supabase
       .from('trainees')
-      .select('id, phone_encrypted, name_encrypted')
-      .eq('id', trainee_id)
-      .single()
+      .select('id, phone_encrypted, name_encrypted');
+      
+    if (trainee_id !== 'demo-id') {
+      traineeQuery = traineeQuery.eq('id', trainee_id);
+    } else {
+      // Demo mode: just grab the first trainee in the DB
+      traineeQuery = traineeQuery.limit(1);
+    }
+    
+    const { data } = await traineeQuery;
+    const trainee = data?.[0];
 
-    if (!trainee) return NextResponse.json({ error: 'Trainee not found' }, { status: 404 })
+    if (!trainee) return NextResponse.json({ error: 'Trainee not found (did you run the seed script?)' }, { status: 404 })
 
     // 2. Generate a secure random token for the survey link
     const surveyToken = crypto.randomUUID()
