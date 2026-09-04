@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "NAME_2": "Pune" },
+      "geometry": { "type": "Polygon", "coordinates": [[[73.5, 18.2], [74.5, 18.2], [74.5, 19.2], [73.5, 19.2], [73.5, 18.2]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "NAME_2": "Mumbai" },
+      "geometry": { "type": "Polygon", "coordinates": [[[72.8, 18.9], [73.0, 18.9], [73.0, 19.1], [72.8, 19.1], [72.8, 18.9]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "NAME_2": "Gadchiroli" },
+      "geometry": { "type": "Polygon", "coordinates": [[[79.5, 19.5], [80.5, 19.5], [80.5, 20.5], [79.5, 20.5], [79.5, 19.5]]] }
+    }
+  ]
+}
