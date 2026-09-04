@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 
-export async function GET(req: Request, { params }: { params: { token: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ token: string }> }) {
   const supabase = createServiceClient()
+  const resolvedParams = await params;
+  const token = resolvedParams.token;
   
   // 1. Find the touchpoint by token
   const { data: touchpoint, error } = await supabase
     .from('followup_touchpoints')
     .select('id, status, checkpoint_days, trainees(name_encrypted)')
-    .eq('survey_token', params.token)
+    .eq('survey_token', token)
     .single()
 
   if (error || !touchpoint) {
@@ -19,14 +21,23 @@ export async function GET(req: Request, { params }: { params: { token: string } 
     return NextResponse.json({ already_done: true })
   }
 
+  // Handle Supabase return type for joined tables (can be array or object)
+  const traineesData = touchpoint.trainees as any;
+  const traineeName = Array.isArray(traineesData) 
+    ? traineesData[0]?.name_encrypted 
+    : traineesData?.name_encrypted;
+
   return NextResponse.json({
     checkpoint_days: touchpoint.checkpoint_days,
-    trainee_name: touchpoint.trainees?.name_encrypted?.split(' ')[0] || 'there'
+    trainee_name: traineeName?.split(' ')[0] || 'there'
   })
 }
 
-export async function POST(req: Request, { params }: { params: { token: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
   try {
+    const resolvedParams = await params;
+    const token = resolvedParams.token;
+    
     const body = await req.json()
     const { employed, employer_name, salary_band, sector, reason } = body
     const supabase = createServiceClient()
@@ -35,7 +46,7 @@ export async function POST(req: Request, { params }: { params: { token: string }
     const { data: touchpoint } = await supabase
       .from('followup_touchpoints')
       .select('id, trainee_id, checkpoint_days, status')
-      .eq('survey_token', params.token)
+      .eq('survey_token', token)
       .single()
 
     if (!touchpoint || touchpoint.status === 'responded') {
